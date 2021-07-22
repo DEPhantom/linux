@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- Launch ROS Package Template Node -->
+  <node pkg="ros_package_template" type="Bidder1.py" name="Bidder1" output="screen" />
+  <node pkg="ros_package_template" type="Bidder2.py" name="Bidder2" output="screen" />
+  <node pkg="ros_package_template" type="Bidder3.py" name="Bidder3" output="screen" />
+  <node pkg="ros_package_template" type="Tenderer.py" name="Tenderer" output="screen" />
+
+</launch>

@@ -1,0 +1,8 @@
+<launch>
+
+  <!-- Launch ROS Package Template Node -->
+  <node pkg="ros_package_template" type="Producer.py" name="Producer" output="screen" />
+  <node pkg="ros_package_template" type="Consumer.py" name="Consumer" output="screen" />
+   
+
+</launch>
