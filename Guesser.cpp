@@ -15,23 +15,24 @@ void Callback (const std_msgs::String::ConstPtr& msg) {
         number = rand() % (max - min + 1) + min ; 
         ROS_INFO("%d",number) ;
         answer.data = number ;
-        number_pub.publish(answer.data) ; 
+        number_pub.publish(answer) ; 
     } // if
     else if ( strcmp( msg->data.c_str(), "Lower") == 0 ) {
         max = number ;
         number = rand() % (max - min + 1) + min ;
         ROS_INFO("%d",number) ;
         answer.data = number ;
-        number_pub.publish(answer.data) ; 
+        number_pub.publish(answer) ; 
     } // else if
-    else if ( strcmp( msg->data.c_str(), "Correct") == 0 ) {
-        answer.data = number ;
-        number_pub.publish(answer.data) ; 
+    else if ( strcmp( msg->data.c_str(), "Correct") == 0 ) { 
         ROS_INFO("The Answer is: [%d]" , number ) ;
-    } // else if
-    else 
         answer.data = number ;
-        number_pub.publish(answer.data) ;
+        number_pub.publish(answer) ; 
+    } // else if
+    else { 
+        answer.data = number ;
+        number_pub.publish(answer) ;
+    } // else
 }
 void guesser(){
     ros::Rate loop_rate(1) ;
@@ -40,7 +41,7 @@ void guesser(){
     while( ros::ok() ) {
         ROS_INFO("%d",number) ;
         answer.data = number ;
-        number_pub.publish(answer.data) ; 
+     //   number_pub.publish(answer.data) ; 
         ros::spinOnce() ;  
     } // while()
 }
