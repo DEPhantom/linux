@@ -1,0 +1,4 @@
+int32 price
+string leader
+---
+int32 now_price
