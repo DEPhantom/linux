@@ -179,7 +179,7 @@ def Forward( length, is_adjust ):
     twist_msg.angular.y = 0
     twist_msg.angular.z = 0 
     cmd_vel_pub.publish( twist_msg ) # stop
-	rospy.sleep( 0.5 ) # too fast will miss
+	rospy.sleep( 0.1 ) # too fast will miss
   # end for
 
 # end Forward
@@ -283,7 +283,7 @@ def Backward( length, is_adjust ):
     twist_msg.angular.y = 0
     twist_msg.angular.z = 0 
     cmd_vel_pub.publish( twist_msg ) # stop
-	rospy.sleep( 0.5 ) # too fast will miss
+    rospy.sleep( 0.1 ) # too fast will miss
   # end for
 
 # end Backward()
