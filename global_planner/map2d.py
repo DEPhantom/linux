@@ -17,9 +17,9 @@ class map2d:
         self.pathTag = 'o'
         self.pathway = []
 
-    def getMap(self):
+    def getMap(self, filename ):
         test = []
-        f = open('tete.pgm')
+        f = open(filename)
         line = f.readline()
         print(line)
         line2 = f.readline()
