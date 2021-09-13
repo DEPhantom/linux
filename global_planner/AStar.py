@@ -8,13 +8,13 @@ class Point:
 
 class Node:
     def __init__(self, point, g=0, h=0):
-        self.point = point  # 自己的座標
-        self.father = None  # 父節點
-        self.g = g  # g值
-        self.h = h  # h值
+        self.point = point  # self site
+        self.father = None  # father node 
+        self.g = g  # g  value
+        self.h = h  # h value
 
     """
-    估價公式：曼哈頓演算法
+     manhaton algorithm
      """
 
     def manhattan(self, endNode):
@@ -30,35 +30,35 @@ class Node:
 
 class AStar:
     """
-    A* 演算法 
+    A* algorithm
     python 2.7 
     """
 
     def __init__(self, map2d, startNode, endNode):
         """ 
-        map2d:      尋路陣列 
-        startNode:  尋路起點 
-        endNode:    尋路終點 
+        map2d:        to find the way array 
+        startNode:    to find the starting point
+        endNode:      to find the finishing point
         """
-        # 開放列表
+        #
         self.openList = []
-        # 封閉列表
+        # 
         self.closeList = []
-        # 地圖資料
+        # 
         self.map2d = map2d
-        # 起點
+        # 
         self.startNode = startNode
-        # 終點
+        # 
         self.endNode = endNode
-        # 當前處理的節點
+        # 
         self.currentNode = startNode
-        # 最後生成的路徑
+        # 
         self.pathlist = []
         return
 
     def getMinFNode(self):
         """ 
-        獲得openlist中F值最小的節點 
+        get the node which the F value is the smallest in openlist 
         """
         nodeTemp = self.openList[0]
         for node in self.openList:
@@ -96,31 +96,31 @@ class AStar:
 
     def searchOneNode(self, node):
         """ 
-        搜尋一個節點
-        x為是行座標
-        y為是列座標
+         search a node
+         x is row
+         y is column
         """
-        # 忽略障礙
+        # ignore the obstacle
         if self.map2d.isPass(node.point) != True:
             return
-        # 忽略封閉列表
+        # ignore the list
         if self.nodeInCloselist(node):
             return
-        # G值計算
+        # G value calculation
         if abs(node.point.x - self.currentNode.point.x) == 1 and abs(node.point.y - self.currentNode.point.y) == 1:
             gTemp = 14
         else:
             gTemp = 10
 
-        # 如果不再openList中，就加入openlist
+        # If not in openlist, just add in openlist
         if self.nodeInOpenlist(node) == False:
             node.setG(gTemp)
-            # H值計算
+            # H value calculation
             node.manhattan(self.endNode)
             self.openList.append(node)
             node.father = self.currentNode
-        # 如果在openList中，判斷currentNode到當前點的G是否更小
-        # 如果更小，就重新計算g值，並且改變father
+        #  If in openlist, judge "currentNode" to current node's "G" smaller or not
+        #  If smaller, recalculate g value, and change the father
         else:
             nodeTmp = self.getNodeFromOpenList(node)
             if self.currentNode.g + gTemp < nodeTmp.g:
@@ -130,9 +130,9 @@ class AStar:
 
     def searchNear(self):
         """ 
-        搜尋節點周圍的點 
-        按照八個方位搜尋
-        拐角處無法直接到達
+        search the node around
+        search step by eight direction
+        can't reach the corner directly
         (x-1,y-1)(x-1,y)(x-1,y+1)
         (x  ,y-1)(x  ,y)(x  ,y+1)
         (x+1,y-1)(x+1,y)(x+1,y+1)
@@ -171,23 +171,23 @@ class AStar:
 
     def start(self):
         ''''' 
-        開始尋路 
+        start
         '''
-        # 將初始節點加入開放列表
+        # put the startnode in openlist
         self.startNode.manhattan(self.endNode)
         self.startNode.setG(0)
         self.openList.append(self.startNode)
 
         while True:
-            # 獲取當前開放列表裡F值最小的節點
-            # 並把它新增到封閉列表，從開發列表刪除它
+            # get the node which the F value is the smallest in current openlist
+            # put it in closelist and remove from openlist
             self.currentNode = self.getMinFNode()
             self.closeList.append(self.currentNode)
             self.openList.remove(self.currentNode)
 
             self.searchNear()
 
-            # 檢驗是否結束
+            # finish or not?
             if self.endNodeInOpenList():
                 nodeTmp = self.getNodeFromOpenList(self.endNode)
                 while True:

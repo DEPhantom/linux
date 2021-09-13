@@ -4,7 +4,7 @@ import copy
 
 class map2d:
     """
-    地圖資料
+    map data
     """
 
     def __init__(self):

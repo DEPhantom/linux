@@ -21,7 +21,7 @@ from tf.transformations import quaternion_from_euler
 import threading
 import time
 
-import pathxy
+# import pathxy
 import AStar
 import map2d
 
@@ -179,7 +179,7 @@ def Forward( length, is_adjust ):
     twist_msg.angular.y = 0
     twist_msg.angular.z = 0 
     cmd_vel_pub.publish( twist_msg ) # stop
-	rospy.sleep( 0.1 ) # too fast will miss
+    rospy.sleep( 0.1 ) # too fast will miss
   # end for
 
 # end Forward
@@ -423,19 +423,19 @@ def part_path( path ) :
   global path_count
   global virtual_degree
   
-  if ( len( path ) > 1 and ( virtual_degree == find_degree() ) ) :
+  if ( len( path ) > 1 and ( virtual_degree == find_degree( path ) ) ) :
     now_degree = virtual_degree
-	path_count = path_count+1
+    path_count = path_count+1
     distance = 1
   # end if()
   else :
-	now_degree = find_degree()
-	distance = 0
+    now_degree = find_degree( path )
+    distance = 0
   # end else
   
-  while ( ( path_count < len( path )-1 ) and find_degree() == virtual_degree ) :
+  while ( ( path_count < len( path )-1 ) and find_degree( path ) == virtual_degree ) :
     distance = distance + 1
-	path_count = path_count+1
+    path_count = path_count+1
   # end while()
   
   if ( path_count == len( path )-1 or len( path ) == 0 ) :
@@ -472,12 +472,12 @@ def navigation() :
   
   # build map
   aStar_planner = map2d.map2d()
-  aStar_planner.getMap()
+  aStar_planner.getMap( "/home/icshop/catkin_ws/src/my_demo/scripts/new715lab.pgm" )
   aStar_planner.get_origin()
   aStar_planner.pathTag = 'o'
   # setting origin and goal
   aStar = AStar.AStar(aStar_planner, AStar.Node(AStar.Point(aStar_planner.origin_x, aStar_planner.origin_y)), 
-                      AStar.Node(AStar.Point(1, 1)))
+                      AStar.Node(AStar.Point(32, 32)))
 
   # find way
   if aStar.start():
@@ -485,39 +485,40 @@ def navigation() :
     aStar_planner.get_path(aStar.pathlist) 
 	
   path = aStar_planner.pathway
+  set_init_pose( 0, 0, 0 )
 
   while ( not end ):
     action = part_path( path ) 
     if ( action.direct == "forward" ) :
-	  Forward( action.distance )
+      Forward( action.distance, False )
       for i in range( 3 ) :
         adjust_position()
       # end for
       
     # end if
     elif ( action.direct == "left" ) :
-	  Turn_left( action.degree )
+      Turn_left( action.degree, False )
       for i in range( 3 ) :
         adjust_degree()
       # end for
       
     # end if
     elif ( action.direct == "right" ) :
-	  Turn_right( action.degree )
+      Turn_right( action.degree, False )
       for i in range( 3 ) :
         adjust_degree()
       # end for
       
     # end if
     elif ( action.direct == "back" ) :
-	  Backward( action.distance )
+      Backward( action.distance, False )
       for i in range( 3 ) :
         adjust_position()
       # end for
       
     # end if
     else :
-	  loginfo( "diretion is %s" %action.direct )
+      loginfo( "diretion is %s" %action.direct )
 	  
   # end while()
 	  
