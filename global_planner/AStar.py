@@ -47,14 +47,18 @@ class AStar:
         # 
         self.map2d = map2d
         # 
+        startNode.point.x = -startNode.point.x + map2d.origin_x 
+        startNode.point.y = -startNode.point.y + map2d.origin_y
         self.startNode = startNode
-        # 
+        #
+        endNode.point.x = -endNode.point.x + map2d.origin_x 
+        endNode.point.y = -endNode.point.y + map2d.origin_y
         self.endNode = endNode
         # 
         self.currentNode = startNode
         # 
         self.pathlist = []
-        return
+        
 
     def getMinFNode(self):
         """ 
@@ -126,7 +130,7 @@ class AStar:
             if self.currentNode.g + gTemp < nodeTmp.g:
                 nodeTmp.g = self.currentNode.g + gTemp
                 nodeTmp.father = self.currentNode
-        return
+        
 
     def searchNear(self):
         """ 
@@ -167,7 +171,7 @@ class AStar:
                 self.map2d.isPass(Point(self.currentNode.point.x, self.currentNode.point.y + 1)):
             self.searchOneNode(
                 Node(Point(self.currentNode.point.x + 1, self.currentNode.point.y + 1)))
-        return
+        
 
     def start(self):
         ''''' 
@@ -204,4 +208,4 @@ class AStar:
         for node in self.pathlist:
             self.map2d.setMap(node.point)
 
-        return
+        

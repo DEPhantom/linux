@@ -21,15 +21,15 @@ class map2d:
         test = []
         f = open(filename)
         line = f.readline()
-        print(line)
+        #print(line)
         line2 = f.readline()
         line2 = line2.replace('\n', '')
         temp = line2.split(' ')
         self.w = int(temp[0])
         self.h = int(temp[1])
-        print(line2)
+        #print(line2)
         line3 = f.readline()
-        print(line3)
+        #print(line3)
         for line in f.readlines():
             lie = line[:len(line)-2]
             s = lie.split(' ')
@@ -41,11 +41,11 @@ class map2d:
             for y in range(0, self.w):
                 print(self.data[x][y], end='')
             print(" ")
-        return
+        
 
     def setMap(self, point):
         self.data[point.x][point.y] = self.pathTag
-        return
+        
 
     def isPass(self, point):
         if (point.x < 0 or point.x > self.h - 1) or (point.y < 0 or point.y > self.w - 1):
@@ -64,7 +64,7 @@ class map2d:
             y = self.pathway[i].y-self.origin_y
             self.pathway[i].x = -x
             self.pathway[i].y = -y
-        return
+        
 
     def get_origin(self):
         for i in range(len(self.data)):
@@ -72,4 +72,6 @@ class map2d:
                 if self.data[i][j] == "@":
                     self.origin_x = i
                     self.origin_y = j
-        return
+                    self.data[i][j] = "*"
+    def clear_map(self):
+        del self.pathway[:]
