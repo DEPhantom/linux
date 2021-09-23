@@ -530,6 +530,7 @@ def clear_status( target_x, target_y ) :
   global start_y
   global path_count
   aStar_planner.clear_map()
+  aStar_planner.clear_path()
   end = False
   start_x = target_x
   start_y = target_y
@@ -543,25 +544,33 @@ def navigation( target_x, target_y ) :
   global aStar_planner
   global start_x
   global start_y
+  global actual_x
+  global actual_y
   # build map
 
-  local_x = 
-  local_y = 
-  aStar = AStar.AStar(aStar_planner, AStar.Node(AStar.Point( start_x, start_y)), 
-                      AStar.Node(AStar.Point( target_x, target_y )))
+  local_x = start_x 
+  local_y = start_y
+  has_move = True
+  while ( not end ) :
+    if ( has_move ) :
+      clear_status( target_x, target_y )
+      print( "%d %d %d %d" %( local_x, local_y, target_x, target_y ) )
+      aStar = AStar.AStar(aStar_planner, AStar.Node(AStar.Point( local_x, local_y)), 
+                          AStar.Node(AStar.Point( target_x, target_y )))
+      
+      print( "out" )
+      # find way
+      if aStar.start():
+        aStar.setMap()
+        aStar_planner.get_path(aStar.pathlist) 
 
-  # find way
-  if aStar.start():
-    aStar.setMap()
-    aStar_planner.get_path(aStar.pathlist) 
-	
-  path = aStar_planner.pathway
-  aStar_planner.showMap()
+      path = aStar_planner.pathway
+      print( len( path ) )
+      aStar_planner.showMap()
+      has_move = False
+    # end if
 
-  if ( len( path ) > 0 ) :
-    print( "has path" )
-
-  while ( not end ):
+    # move
     action = part_path( path ) 
     if ( action.direct == "forward" ) :
       Forward( action.distance, False )
@@ -570,6 +579,7 @@ def navigation( target_x, target_y ) :
         adjust_position()
       # end for
       
+      has_move = True
     # end if
     elif ( action.direct == "left" ) :
       Turn_left( action.degree, False )
@@ -591,10 +601,14 @@ def navigation( target_x, target_y ) :
         adjust_position()
       # end for
       
+      has_move = True
     # end if
     else :
       loginfo( "diretion is %s" %action.direct )
 	  
+    local_x = int( math.ceil( actual_x/5 ) )
+    local_y = int( math.ceil( actual_y/5 ) )
+
   # end while()
 
   print( " now is end : %d" %end )
@@ -623,7 +637,7 @@ if __name__ == '__main__':
   """
 
   navigation( 23, 35 )
-  # navigation( 44, 4 )
+  navigation( 40, 8 )
 
   thread1.join()  
 

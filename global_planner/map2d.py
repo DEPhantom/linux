@@ -73,5 +73,11 @@ class map2d:
                     self.origin_x = i
                     self.origin_y = j
                     self.data[i][j] = "*"
-    def clear_map(self):
+    def clear_path(self):
         del self.pathway[:]
+ 
+    def clear_map(self):
+        for i in range(len(self.data)):
+            for j in range(len(self.data[i])):
+                if self.data[i][j] == "o":
+                    self.data[i][j] = "*"
