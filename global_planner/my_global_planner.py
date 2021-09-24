@@ -177,7 +177,7 @@ def Forward( length, is_adjust ):
     end = time.time()
   # end while()
   
-  for i in range( 20 ) :
+  for i in range( 10 ) :
     twist_msg.linear.x = 0
     twist_msg.linear.y = 0 
     twist_msg.linear.z = 0 
@@ -214,7 +214,7 @@ def Turn_left( degree, is_adjust ):
     end = time.time()
   # end while()
   
-  for i in range( 20 ) :
+  for i in range( 10 ) :
     twist_msg.linear.x = 0
     twist_msg.linear.y = 0 
     twist_msg.linear.z = 0 
@@ -250,7 +250,7 @@ def Turn_right( degree, is_adjust ):
     end = time.time()
   # end while()
   
-  for i in range( 20 ) :
+  for i in range( 10 ) :
     twist_msg.linear.x = 0
     twist_msg.linear.y = 0 
     twist_msg.linear.z = 0 
@@ -284,7 +284,7 @@ def Backward( length, is_adjust ):
     end = time.time()
   # end while()
   
-  for i in range( 20 ) :
+  for i in range( 10 ) :
     twist_msg.linear.x = 0
     twist_msg.linear.y = 0 
     twist_msg.linear.z = 0 
@@ -565,7 +565,21 @@ def navigation( target_x, target_y ) :
         aStar_planner.get_path(aStar.pathlist) 
 
       path = aStar_planner.pathway
-      print( len( path ) )
+      while( len( path ) < 2 ) :
+        clear_status( target_x, target_y )
+        local_x = int( math.ceil( actual_x/5 ) )
+        local_y = int( math.ceil( actual_y/5 ) )
+        print( local_x )
+        aStar = AStar.AStar(aStar_planner, AStar.Node(AStar.Point( local_x, local_y)), 
+                            AStar.Node(AStar.Point( target_x, target_y )))
+
+        # find way
+        if aStar.start():
+          aStar.setMap()
+          aStar_planner.get_path(aStar.pathlist) 
+
+        path = aStar_planner.pathway
+      # end while
       aStar_planner.showMap()
       has_move = False
     # end if
