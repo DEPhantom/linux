@@ -7,7 +7,7 @@ class map_data:  # struct
     def __init__(self):
         self.origin = ''
         self.change = '*'
-        self.new_object = '*'  # laser_scan的東西
+        self.new_object = '*'  # laser_scan thing
     # end __init__
 
 # end class
@@ -67,7 +67,8 @@ class map2d:
             print(" ")
 
     def setMap(self, point):
-        self.data[point.x][point.y] = self.pathTag
+        if ( self.data[point.x][point.y] != '#' ) :
+            self.data[point.x][point.y] = self.pathTag
 
     def isPass(self, point):
         if (point.x < 0 or point.x > self.h - 1) or (point.y < 0 or point.y > self.w - 1):
@@ -98,17 +99,30 @@ class map2d:
     def clear_path(self):
         del self.pathway[:]
 
+    def clear_update_map(self):
+        seld.data = copy.copy(self.origin_data)
+
     def clear_map(self):
         for i in range(len(self.data)):
             for j in range(len(self.data[i])):
                 if self.data[i][j] == "o":
                     self.data[i][j] = "*"
 
-    def data_set(self, data):
-        for i in range(0, 359):
-            if data[i].lenth != -1:
-                data[i].x = round(data[i].lenth * math.cos(i*math.pi/180))
-                data[i].y = round(data[i].lenth * math.sin(i*math.pi/180))
+    def data_set(self, data, degree ):
+        for count in range(0, 359):
+            i = count + degree
+            if ( i >= 360 ):
+                i = i-360
+            # end if
+            elif ( i < 0 ) :
+               i = i+360
+            # end elif()
+
+            if data[count].lenth != -1:
+                data[count].x = round(data[count].lenth * math.cos(i*math.pi/180))
+                data[count].y = round(data[count].lenth * math.sin(i*math.pi/180))
+    
+    # end data_set()
 
     def new_obstacle(self, new_map, new_obs, y, x):
         for i in range(0, 359):
@@ -122,15 +136,15 @@ class map2d:
 
     def obs_increase(self, new_map):
 
-        cols = 122
-        rows = 129
+        cols = self.w
+        rows = self.h
         # print(new_map[65][10].new_object)
         for j in range(0, cols):
             for i in range(0, rows):
                 new_map[i][j].change = new_map[i][j].origin
 
         # end for
-        for j in range(0, cols):  # 增厚
+        for j in range(0, cols):  # increase
             for i in range(0, rows):
                 if new_map[i][j].origin == '*' and new_map[i][j].new_object == '#':
                     if new_map[i][j].new_object == '#':
@@ -178,7 +192,7 @@ class map2d:
         temp = ang_data()
         temp.lenth = 5
 
-    # 讀入data
+    # read data
         for i in range(0, 359):
             b = copy.copy(temp)
             list1.append(b)
@@ -187,9 +201,8 @@ class map2d:
 
     # end update_test()
 
-    def update_map(self):
-        fake_lidar = self.update_test()
-        self.data_set(fake_lidar)
+    def update_map( self, lidar, current_x, current_y, current_degree ):
+        self.data_set( lidar, current_degree )
         yu_data = []
         temp_list = []
         for i in range(len(self.data)):
@@ -205,8 +218,8 @@ class map2d:
 
         # end for
 
-        self.new_obstacle(yu_data, fake_lidar, 20, -20)  # 20 100
-        self.showObj(yu_data)
+        self.new_obstacle(yu_data, fake_lidar, current_x, current_y )  # 20 100
+        # self.showObj(yu_data)
         for i in range(3):
             self.obs_increase(yu_data)
         # end for
@@ -215,4 +228,11 @@ class map2d:
             for j in range(len(yu_data[i])):
                 self.data[i][j] = yu_data[i][j].change
             # end for
+
         # end for
+
+    # end update_map()
+
+
+
+

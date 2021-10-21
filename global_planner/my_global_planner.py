@@ -18,6 +18,7 @@ import geometry_msgs.msg
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from tf.transformations import euler_from_quaternion
 from tf.transformations import quaternion_from_euler
+from sensor_msgs.msg import LaserScan
 import threading
 import time
 
@@ -38,6 +39,7 @@ end = False
 aStar_planner = map2d.map2d()
 start_x = 0
 start_y = 0
+lidar = []
 
 class pose:
   
@@ -118,8 +120,19 @@ def update_actual_pose() :
     rate.sleep()
   
   # end while()  
-   
+
 # end update_actual_pose()
+
+def update_lidar( data ) :
+  global lidar
+  lidar = data.ranges
+  rospy.loginfo( data.ranges )
+# end update_lidar()
+
+def get_lidar_signal() :
+  rospy.Subscriber( "scan", LaserScan, update_lidar )
+  rospy.spin()
+# end get_lidar_signal()
 
 def calculate_linear( length ) :
   x = Symbol('x')
@@ -165,7 +178,7 @@ def Forward( length, is_adjust ):
  
   start = time.time()
   end = time.time()
-  run_time = length*3/71
+  run_time = ( length-24.0/19.0 )*19/448
   while( end - start <= run_time ) :
     twist_msg.linear.x =  0.13
     twist_msg.linear.y = 0 
@@ -202,7 +215,7 @@ def Turn_left( degree, is_adjust ):
 
   start = time.time()
   end = time.time()
-  run_time = degree/360.0*3.84
+  run_time = degree/135.0*1.6
   while( end - start <= run_time ) :
     twist_msg.linear.x =  0
     twist_msg.linear.y = 0 
@@ -238,7 +251,7 @@ def Turn_right( degree, is_adjust ):
 
   start = time.time()
   end = time.time()
-  run_time = degree/360.0*3.84
+  run_time = degree/135.0*1.6
   while( end - start <= run_time ) :
     twist_msg.linear.x =  0
     twist_msg.linear.y = 0 
@@ -272,7 +285,7 @@ def Backward( length, is_adjust ):
 
   start = time.time()
   end = time.time()
-  run_time = length*3/71
+  run_time = ( length-24.0/19.0 )*19/448
   while( end - start <= run_time ) :
     twist_msg.linear.x = -0.13
     twist_msg.linear.y = 0 
@@ -546,6 +559,7 @@ def navigation( target_x, target_y ) :
   global start_y
   global actual_x
   global actual_y
+  global actual_degree
   # build map
 
   local_x = start_x 
@@ -566,10 +580,12 @@ def navigation( target_x, target_y ) :
 
       path = aStar_planner.pathway
       while( len( path ) < 2 ) :
+        adjust_position()
         clear_status( target_x, target_y )
         local_x = int( math.ceil( actual_x/5 ) )
         local_y = int( math.ceil( actual_y/5 ) )
-        print( local_x )
+        print( "now x : %d, %d" %(local_x, actual_x) )
+        print( "now y : %d, %d" %(local_y, actual_y) )
         aStar = AStar.AStar(aStar_planner, AStar.Node(AStar.Point( local_x, local_y)), 
                             AStar.Node(AStar.Point( target_x, target_y )))
 
@@ -623,6 +639,8 @@ def navigation( target_x, target_y ) :
     local_x = int( math.ceil( actual_x/5 ) )
     local_y = int( math.ceil( actual_y/5 ) )
 
+    aStar_planner.update_map( lidar, local_x, local_y, actual_degree )
+    # sometime we need to call aStar_planner.clear_update_map()
   # end while()
 
   print( " now is end : %d" %end )
@@ -636,23 +654,28 @@ if __name__ == '__main__':
   rospy.sleep( 10 ) # wait for lidar
   thread1 = threading.Thread( target = update_actual_pose )
   thread1.start()
+  thread2 = threading.Thread( target = get_lidar_signal )
+  thread2.start()
   speedinit()
-  aStar_planner.getMap( "/home/icshop/catkin_ws/src/my_demo/scripts/trick.pgm" )
+  aStar_planner.getMap( "/home/ros/catkin_ws/src/my_demo/scripts/wolves_street.pgm" )
   aStar_planner.get_origin()
   aStar_planner.pathTag = 'o'
   # setting origin and goal
   set_init_pose( 0, 0, 0 )
   start_x = 0
   start_y = 0
-  """
-  while ( True ) :
-    read target
-    navigation( 32, 32 )
-  """
+  input_x = input( "please input target x: " )
+  input_y = input( "please input target y: " )
+  while ( input_x >= 0 and input_y >= 0 ) :
+    navigation( input_x, input_y )
+    input_x = input( "please input target x: " )
+    input_y = input( "please input target y: " )
+  # end while()
 
-  navigation( 23, 35 )
-  navigation( 40, 8 )
+  # navigation( 23, 35 )
+  # navigation( 40, 8 )
 
-  thread1.join()  
+  thread1.join() 
+  thread2.join() 
 
 # end main
