@@ -26,7 +26,7 @@ import time
 import AStar
 import map2d
 
-cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+cmd_vel_pub = rospy.Publisher('/rosky/cmd_vel', Twist, queue_size = 1)
 twist_msg = Twist()
 virtual_x = 0
 virtual_y = 0
@@ -126,7 +126,6 @@ def update_actual_pose() :
 def update_lidar( data ) :
   global lidar
   lidar = data.ranges
-  rospy.loginfo( data.ranges )
 # end update_lidar()
 
 def get_lidar_signal() :
@@ -603,7 +602,10 @@ def navigation( target_x, target_y ) :
     # move
     action = part_path( path ) 
     if ( action.direct == "forward" ) :
-      Forward( action.distance, False )
+      if ( action.distance > 30 ) :
+        Forward( 30, False )
+      else :
+        Forward( action.distance, False )
       print( " your mom dead %d" %action.distance )
       for i in range( 0 ) :
         adjust_position()
@@ -640,6 +642,7 @@ def navigation( target_x, target_y ) :
     local_y = int( math.ceil( actual_y/5 ) )
 
     aStar_planner.update_map( lidar, local_x, local_y, actual_degree )
+    aStar_planner.showMap()
     # sometime we need to call aStar_planner.clear_update_map()
   # end while()
 
@@ -649,7 +652,7 @@ def navigation( target_x, target_y ) :
 # end navigation()
 
 if __name__ == '__main__':
-  rospy.init_node( 'global planner' )
+  rospy.init_node( 'global_planner' )
   rospy.loginfo( "global planner on" )
   rospy.sleep( 10 ) # wait for lidar
   thread1 = threading.Thread( target = update_actual_pose )
@@ -666,8 +669,11 @@ if __name__ == '__main__':
   start_y = 0
   input_x = input( "please input target x: " )
   input_y = input( "please input target y: " )
+  aStar_planner.update_map( lidar, 0, 0, 0 )
   while ( input_x >= 0 and input_y >= 0 ) :
     navigation( input_x, input_y )
+    # aStar_planner.update_map( lidar, 0, 0, 0 )
+    # aStar_planner.showMap()
     input_x = input( "please input target x: " )
     input_y = input( "please input target y: " )
   # end while()

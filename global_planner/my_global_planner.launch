@@ -5,10 +5,10 @@
     <!-- initial arg-->
     <arg name="veh" default="$(env VEHICLE_NAME)" doc="Name of vehicle. ex: megaman"/>
     <arg name="config" default="baseline" doc="Specify a config."/>
-    <arg name="map" default="test0623.yaml" doc="Specify a param file. ex:megaman."/>
+    <arg name="map" default="trick.yaml" doc="Specify a param file. ex:megaman."/>
     <arg name="use_rviz" default="false" />
     <arg name="local_planner" default="dwa" doc="Local planner can be either dwa or teb"/>
-    <arg name="ominibotcar" default="false" doc="connect omnibotcar to move ROSKY or not"/>
+    <arg name="ominibotcar" default="true" doc="connect omnibotcar to move ROSKY or not"/>
 
     <!-- Map server -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(find rosky_slam)/map/$(arg map)"/>
@@ -41,9 +41,9 @@
     </node>
 
     <!-- my_teleop -->
-    <group ns="$(arg veh)">
-        <node pkg="my_demo" type="my_global_planner.py" name="controller" output="screen" />
-    </group>
+    <!-- group ns="$(arg veh)" -->
+    <node pkg="my_demo" type="my_global_planner.py" name="controller" output="screen" />
+    <!-- /group -->
 
     <!-- keyboard_mapper -->
     <remap from="/$(arg veh)/keyboard_mapper_node/cmd_vel" to="cmd_vel"/>

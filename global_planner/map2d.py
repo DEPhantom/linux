@@ -109,8 +109,9 @@ class map2d:
                     self.data[i][j] = "*"
 
     def data_set(self, data, degree ):
-        for count in range(0, 359):
-            i = count + degree
+        for count in range(0, 720):
+            i = count/2.0 -90+ degree
+            i = -i + 360
             if ( i >= 360 ):
                 i = i-360
             # end if
@@ -118,19 +119,29 @@ class map2d:
                i = i+360
             # end elif()
 
+        #    print( len(data) ) # test
             if data[count].lenth != -1:
-                data[count].x = round(data[count].lenth * math.cos(i*math.pi/180))
-                data[count].y = round(data[count].lenth * math.sin(i*math.pi/180))
-    
+                data[count].x = round(data[count].lenth*100/5 * math.cos(i*math.pi/180))
+                data[count].y = round(data[count].lenth*100/5 * math.sin(i*math.pi/180))
+
+
     # end data_set()
 
     def new_obstacle(self, new_map, new_obs, y, x):
-        for i in range(0, 359):
-            position_x = -new_obs[i].x - y + self.origin_x
-            position_y = -new_obs[i].y - x + self.origin_y
+        for i in range(0, 720):
+            position_x = - int( new_obs[i].y ) - y + self.origin_x
+            position_y = - int( new_obs[i].x ) - x + self.origin_y
             #position_y = -(new_obs[i].x + x) + self.origin_x
             #position_x = -(new_obs[i].y + y) + self.origin_y
-            new_map[position_x][position_y].new_object = '#'
+            if ( new_obs[i].x != 0 or new_obs[i].y != 0 ) :
+              if ( position_x < len( new_map ) and position_y < len( new_map[0] ) ) :
+                new_map[position_x][position_y].new_object = '#'
+              # end if
+              else :
+                print( "limit x is %d limit y is %d" %( len( new_map ), len( new_map[0] ) ) )
+                print( "error x is %d error y is %d" %( position_x, position_y ) )
+                print( " lidar degree: %d" %( i ) )
+              # end else
             # print(position_x, end=" ")
             # print(position_y)
 
@@ -148,30 +159,70 @@ class map2d:
             for i in range(0, rows):
                 if new_map[i][j].origin == '*' and new_map[i][j].new_object == '#':
                     if new_map[i][j].new_object == '#':
-                        if i-1 >= 0 and j-1 >= 0:
+                        if i-3 >= 0 and j-3 >= 0:   # left top
                             new_map[i-1][j-1].change = '#'
-                        if i >= 0 and j-1 >= 0:
+                            new_map[i-2][j-1].change = '#'
+                            new_map[i-3][j-1].change = '#'
+                            new_map[i-1][j-2].change = '#'
+                            new_map[i-2][j-2].change = '#'
+                            new_map[i-3][j-2].change = '#'
+                            new_map[i-1][j-3].change = '#'
+                            new_map[i-2][j-3].change = '#'
+                            new_map[i-3][j-3].change = '#'
+                        if i >= 0 and j-3 >= 0:    # top
                             new_map[i][j-1].change = '#'
-                        if i+1 < rows and j-1 >= 0:
+                            new_map[i][j-2].change = '#'
+                            new_map[i][j-3].change = '#'
+                        if i+3 < rows and j-3 >= 0:  #right top
                             new_map[i+1][j-1].change = '#'
-                        if i-1 >= 0 and j >= 0:
+                            new_map[i+2][j-1].change = '#'
+                            new_map[i+3][j-1].change = '#'
+                            new_map[i+1][j-2].change = '#'
+                            new_map[i+2][j-2].change = '#'
+                            new_map[i+3][j-2].change = '#'
+                            new_map[i+1][j-3].change = '#'
+                            new_map[i+2][j-3].change = '#'
+                            new_map[i+3][j-3].change = '#'
+                        if i-3 >= 0 and j >= 0:  #left
                             new_map[i-1][j].change = '#'
+                            new_map[i-2][j].change = '#'
+                            new_map[i-3][j].change = '#'
                         if i >= 0 and j >= 0:
                             new_map[i][j].change = '#'
-                        if i+1 < rows and j >= 0:
+                        if i+3 < rows and j >= 0:   #right
                             new_map[i+1][j].change = '#'
-                        if i-1 >= 0 and j+1 < cols:
+                            new_map[i+2][j].change = '#'
+                            new_map[i+3][j].change = '#'
+                        if i-3 >= 0 and j+3 < cols:  #bot left
                             new_map[i-1][j+1].change = '#'
-                        if i >= 0 and j+1 < cols:
+                            new_map[i-2][j+1].change = '#'
+                            new_map[i-3][j+1].change = '#'
+                            new_map[i-1][j+2].change = '#'
+                            new_map[i-2][j+2].change = '#'
+                            new_map[i-3][j+2].change = '#'
+                            new_map[i-1][j+3].change = '#'
+                            new_map[i-2][j+3].change = '#'
+                            new_map[i-3][j+3].change = '#'
+                        if i >= 0 and j+3 < cols:  #bot
                             new_map[i][j+1].change = '#'
-                        if i+1 < rows and j+1 < cols:
+                            new_map[i][j+2].change = '#'
+                            new_map[i][j+3].change = '#'
+                        if i+1 < rows and j+1 < cols:  # right bot
                             new_map[i+1][j+1].change = '#'
+                            new_map[i+2][j+1].change = '#'
+                            new_map[i+3][j+1].change = '#'
+                            new_map[i+1][j+2].change = '#'
+                            new_map[i+2][j+2].change = '#'
+                            new_map[i+3][j+2].change = '#'
+                            new_map[i+1][j+3].change = '#'
+                            new_map[i+2][j+3].change = '#'
+                            new_map[i+3][j+3].change = '#'
                     elif new_map[i][j].origin == '@':
                         new_map[i][j].change = new_map[i][j].origin
 
-     #       for j in range(0, cols):
-      #          for i in range(0, rows):
-       #             new_map[i][j].change = new_map[i][j].new_object
+          #  for j in range(0, cols):
+           #     for i in range(0, rows):
+            #        new_map[i][j].change = new_map[i][j].new_object
 
     # end obs_increase
 
@@ -202,7 +253,14 @@ class map2d:
     # end update_test()
 
     def update_map( self, lidar, current_x, current_y, current_degree ):
-        self.data_set( lidar, current_degree )
+        lidar2 = []
+        for i in range( len(lidar) ) :
+          temp = ang_data()
+          temp.lenth = lidar[i]
+          lidar2.append( temp )
+        # end for
+
+        self.data_set( lidar2, current_degree )
         yu_data = []
         temp_list = []
         for i in range(len(self.data)):
@@ -218,9 +276,9 @@ class map2d:
 
         # end for
 
-        self.new_obstacle(yu_data, fake_lidar, current_x, current_y )  # 20 100
-        # self.showObj(yu_data)
-        for i in range(3):
+        self.new_obstacle(yu_data, lidar2, current_x, current_y )  # 20 100
+        self.showObj(yu_data)
+        for i in range(1):
             self.obs_increase(yu_data)
         # end for
 
