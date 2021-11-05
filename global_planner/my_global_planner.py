@@ -96,6 +96,22 @@ def record_position( length, degree ) :
 
 # end record_position()
 
+def relocate_virtual() :
+  global virtual_x 
+  global virtual_y
+  global actual_x
+  global actual_y
+  global aStar_planner
+
+  if ( aStar_planner.point_is_obstacle( int( math.ceil( actual_x/5 ) ), int( math.ceil( actual_y/5 ) ) ) == True ) :
+    temp = 0 # useless
+  # end if()
+  else :
+    virtual_x = actual_x
+    virtual_y = actual_y
+  # end else
+  
+# end relocate_virtual()
 
 def update_actual_pose() :
   global actual_x 
@@ -503,7 +519,7 @@ def part_path( path ) :
     path_count = path_count+1
   # end while()
   
-  if ( path_count == len( path )-1 or len( path ) == 0 ) :
+  if ( ( path_count == len( path )-1 and distance < 4 ) or len( path ) == 0 ) :
     end = True
 	
   action = pose()
@@ -535,7 +551,7 @@ def speedinit():
   
 # end speedinit()
 
-def clear_status( target_x, target_y ) :
+def clear_status( target_x, target_y, at_start ) :
   global aStar_planner 
   global end
   global start_x
@@ -544,8 +560,10 @@ def clear_status( target_x, target_y ) :
   aStar_planner.clear_map()
   aStar_planner.clear_path()
   end = False
-  start_x = target_x
-  start_y = target_y
+  if ( at_start == True ) :
+    start_x = target_x
+    start_y = target_y
+  # end if()
   path_count = 0
 
 # end clear_status()
@@ -566,7 +584,7 @@ def navigation( target_x, target_y ) :
   has_move = True
   while ( not end ) :
     if ( has_move ) :
-      clear_status( target_x, target_y )
+      clear_status( target_x, target_y, False )
       print( "%d %d %d %d" %( local_x, local_y, target_x, target_y ) )
       aStar = AStar.AStar(aStar_planner, AStar.Node(AStar.Point( local_x, local_y)), 
                           AStar.Node(AStar.Point( target_x, target_y )))
@@ -580,7 +598,7 @@ def navigation( target_x, target_y ) :
       path = aStar_planner.pathway
       while( len( path ) < 2 ) :
         adjust_position()
-        clear_status( target_x, target_y )
+        clear_status( target_x, target_y, False )
         local_x = int( math.ceil( actual_x/5 ) )
         local_y = int( math.ceil( actual_y/5 ) )
         print( "now x : %d, %d" %(local_x, actual_x) )
@@ -595,6 +613,7 @@ def navigation( target_x, target_y ) :
 
         path = aStar_planner.pathway
       # end while
+
       aStar_planner.showMap()
       has_move = False
     # end if
@@ -610,8 +629,11 @@ def navigation( target_x, target_y ) :
       for i in range( 0 ) :
         adjust_position()
       # end for
-      
-      has_move = True
+     
+      if ( action.distance >= 10 ) : 
+        has_move = True
+      # end if
+
     # end if
     elif ( action.direct == "left" ) :
       Turn_left( action.degree, False )
@@ -642,12 +664,12 @@ def navigation( target_x, target_y ) :
     local_y = int( math.ceil( actual_y/5 ) )
 
     aStar_planner.update_map( lidar, local_x, local_y, actual_degree )
-    aStar_planner.showMap()
-    # sometime we need to call aStar_planner.clear_update_map()
+    # aStar_planner.showMap()  # show update clear map
+    
   # end while()
 
   print( " now is end : %d" %end )
-  clear_status( target_x, target_y )
+  clear_status( target_x, target_y, True )
 
 # end navigation()
 
@@ -674,8 +696,10 @@ if __name__ == '__main__':
     navigation( input_x, input_y )
     # aStar_planner.update_map( lidar, 0, 0, 0 )
     # aStar_planner.showMap()
+    aStar_planner.clear_update_map()
     input_x = input( "please input target x: " )
     input_y = input( "please input target y: " )
+    relocate_virtual()
   # end while()
 
   # navigation( 23, 35 )

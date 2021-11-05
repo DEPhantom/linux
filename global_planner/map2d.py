@@ -57,8 +57,8 @@ class map2d:
             s = lie.split(' ')
             # print(len(s))
             self.data.append(s)
-        self.origin_data = self.data
-        self.origin_data = copy.copy(self.data)
+
+        self.origin_data = copy.deepcopy(self.data)
 
     def showMap(self):
         for x in range(0, self.h):
@@ -95,12 +95,13 @@ class map2d:
                     self.origin_x = i
                     self.origin_y = j
                     self.data[i][j] = "*"
+                    self.origin_data[i][j] = "*"
 
     def clear_path(self):
         del self.pathway[:]
 
     def clear_update_map(self):
-        seld.data = copy.copy(self.origin_data)
+        self.data = copy.deepcopy(self.origin_data)
 
     def clear_map(self):
         for i in range(len(self.data)):
@@ -266,7 +267,8 @@ class map2d:
         for i in range(len(self.data)):
             for j in range(len(self.data[i])):
                 temp = map_data()
-                temp.origin = self.data[i][j]
+                temp.origin = self.origin_data[i][j]
+                temp.change = self.data[i][j]
                 temp_list.append(temp)
 
             # end for
@@ -291,6 +293,12 @@ class map2d:
 
     # end update_map()
 
+    def point_is_obstacle( self, x, y ) :
+        if ( self.data[self.origin_x-y][self.origin_y-x] == '#' ) :
+            return True
+        else :
+            return False
 
+    # end point_is_obstacle()
 
 
